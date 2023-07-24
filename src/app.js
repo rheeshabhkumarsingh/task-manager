@@ -13,6 +13,16 @@ app.use(userRouter)
 
 app.use(taskTouter)
 
+app.use((err, req, res, next) => {
+    res.status(err.status || 500);
+    res.send({
+        errors:{
+            status: err.status,
+            message: err.message
+        }
+    })
+})
+
 app.listen(PORT, () => {
     console.log('Server is up on PORT: ', PORT)
 })

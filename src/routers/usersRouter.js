@@ -1,9 +1,10 @@
 const express = require('express');
 const router = new express.Router();
 const { User } = require('../models/users');
+const middleware = require('../middleware/user_middleware')
 
 
-router.post('/users', async (req, res) => {
+router.post('/users', middleware.hashPassword, async (req, res) => {
     // res.send('post user')
     // console.log(req.body)
     const user = new User(req.body)
@@ -71,7 +72,17 @@ router.get('/users/:id', async (req, res) => {
     // })
 })
 
-router.patch('/updateuser/:id', async (req, res) => {
+router.post('/user/login', async (req, res) => {
+    try {
+        let user = await User.findByCredentials(req.body.email, req.body.password)
+        res.send({status: 'success', data: user})
+    } catch (error) {
+        console.log(error);
+        res.send(error)
+    }
+})
+
+router.patch('/updateuser/:id',middleware.hashPassword, async (req, res) => {
     let id = req.params.id;
     try {
         let result = await User.findByIdAndUpdate(id, req.body)
