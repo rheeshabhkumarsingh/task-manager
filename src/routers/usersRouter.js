@@ -2,9 +2,10 @@ const express = require('express');
 const router = new express.Router();
 const { User } = require('../models/users');
 const middleware = require('../middleware/user_middleware')
+const joiSchema = require('../schema/usermoduleschema')
 
 
-router.post('/users', middleware.hashPassword, async (req, res) => {
+router.post('/users', joiSchema.checkuser, middleware.hashPassword, async (req, res) => {
     // res.send('post user')
     // console.log(req.body)
     const user = new User(req.body)
@@ -72,9 +73,10 @@ router.get('/users/:id', async (req, res) => {
     // })
 })
 
-router.post('/user/login', async (req, res) => {
+router.post('/user/login', joiSchema.checklogin, async (req, res) => {
     try {
         let user = await User.findByCredentials(req.body.email, req.body.password)
+        console.log(user)
         res.send({status: 'success', data: user})
     } catch (error) {
         console.log(error);
